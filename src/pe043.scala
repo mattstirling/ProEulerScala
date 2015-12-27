@@ -5,7 +5,46 @@ object pe043 {
 
   def factorial(x: BigInt): BigInt = if(x == 0){1}else{x * factorial(x - 1)}
   
-  def stream(i: Long = 1): Stream[Long] = i #:: stream(i + 1)
+  def this_09pandigital(index:Int,div_list:List[Int]):List[Int] = {
+    var select_position = 0
+    var this_index = index
+    var num_list = ListBuffer(9,8,7,6,5,4,3,2,1)
+    var this_pan_list = new ListBuffer[Int] 
+    this_pan_list = ListBuffer.empty
+    for (j <- 0 to 8){
+      if(j==1){num_list+=0}
+      select_position = math.floor(this_index/div_list(j)).toInt
+      //println(i + "," + j + "," + this_index + "," + select_position + "," + num_list(select_position))
+      this_index -= select_position * div_list(j)
+      this_pan_list += num_list(select_position)
+      //println(this_pan_list)
+      num_list -= num_list(select_position)
+    }
+    this_pan_list += num_list(0) 
+    //println(this_pan_list)
+    this_pan_list.toList
+      
+  }
+  
+  def all_09pandigital_stream(): Stream[List[Int]] = {
+    var this_index = 0
+    var select_position = 0
+    val pan_list = new ListBuffer[List[Int]]
+    var num_list = new ListBuffer[Int]
+    var this_pan_list = new ListBuffer[Int]
+    val div_list = new ListBuffer[Int]
+    
+    for (i <- 9 to 1 by -1){
+      div_list += factorial(i).toInt
+    }
+    //println(div_list)
+    
+    Stream.from(0).takeWhile(_ < (9*factorial(9).toInt)-1).map(n => this_09pandigital(n,div_list.toList))
+    
+    //pan_list.toList
+  }
+  
+  
   
   def all_09pandigital(): List[List[Int]] = {
     var this_index = 0
@@ -15,17 +54,16 @@ object pe043 {
     var this_pan_list = new ListBuffer[Int]
     val div_list = new ListBuffer[Int]
     
-    div_list += factorial(8).toInt
-    for (i <- 8 to 1 by -1){
+    for (i <- 9 to 1 by -1){
       div_list += factorial(i).toInt
     }
+    //println(div_list)
     
-    //for (i <- 0 to (9*factorial(9).toInt-1).toInt) {
-    var i = 0L
-    while (i < (9*factorial(9).toInt-1)) {
+    for(i <- 0 to (9*factorial(9).toInt)-1) {
       num_list = ListBuffer(9,8,7,6,5,4,3,2,1)
       this_pan_list = ListBuffer.empty
       this_index = i.toInt
+      //println(i + "," + "")
       for (j <- 0 to 8){
         if(j==1){num_list+=0}
         select_position = math.floor(this_index/div_list(j)).toInt
@@ -34,7 +72,6 @@ object pe043 {
         this_pan_list += num_list(select_position)
         //println(this_pan_list)
         num_list -= num_list(select_position)
-        i+=1     
       }
       this_pan_list += num_list(0) 
       //println(this_pan_list)
@@ -65,10 +102,10 @@ object pe043 {
     result
   }
   
-  def list_09dig_to_num(n_list:List[Int]):Int = {
-    var sum =0
+  def list_09dig_to_num(n_list:List[Int]):Long = {
+    var sum =0L
     for(i<-0 to 9){
-      sum += n_list(i) * math.pow(10,9-i).toInt
+      sum += n_list(i) * math.pow(10,9-i).toLong
     }
     sum
   }
@@ -79,19 +116,23 @@ object pe043 {
     println("In main")
     
     //get all 09pandigital numbers
-    val pan_list = all_09pandigital()
-    var sum = 0
+    val pan_list = all_09pandigital_stream()
+    var sum = 0L
+    var count = 0
     //get all len-3 subnumbers
     //test each len-3 subnumber if it is divisible
     //store/sum each 09pandigital if it passes all tests
     
     
     for(a <- pan_list){
-      println(a)
+      //println(list_09dig_to_num(a))
       if(is_pe043_divisible(a)){
-        sum += list_09dig_to_num(a) 
+        println(list_09dig_to_num(a))
+        sum += list_09dig_to_num(a)
+        count += 1
       }
     }
+    println("count is: " + count)
     println("sum is: " + sum)
   }
 }
